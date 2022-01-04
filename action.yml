@@ -1,0 +1,8 @@
+name: 'Python Dependency License Checker'
+description: 'Checks Python dependencies licenses, failing if any dependency uses any GPL license'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'book-open'
+  color: 'white'
