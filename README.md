@@ -1,5 +1,5 @@
 # PyPI License Checker GitHub Action
-This action validates project's dependencies licenses, failing if it finds any dependency that uses GPL licensing.
+This action validates project's dependencies licenses, failing if it finds any dependency that uses GPL, MPL, and EPL licensing.
 
 ## Example usage
 
