@@ -7,14 +7,14 @@ if [ ! -f requirements.txt ] && [ ! -f pyproject.toml ]; then
     exit 0;
 fi
 
-python -m pip install --upgrade pip --quiet > /dev/null 2>&1
+python -m pip install --upgrade pip --quiet 2>&1 1>/dev/null
 
 if [ -f pyproject.toml ]; then
     pip install poetry --quiet > /dev/null 2>&1
-    POETRY_HTTP_BASIC_GEMFURY_USERNAME="$EXTRA_INDEX_URL_PULL_TOKEN" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet > /dev/null 2>&1
+    POETRY_HTTP_BASIC_GEMFURY_USERNAME="$EXTRA_INDEX_URL_PULL_TOKEN" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet 2>&1 1>/dev/null
 fi
 
-pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_PULL_TOKEN":@"$EXTRA_INDEX_URL" --quiet > /dev/null 2>&1
+pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_PULL_TOKEN":@"$EXTRA_INDEX_URL" --quiet 2>&1 1>/dev/null 
 
 [ $? -eq 0 ] || exit 1
 

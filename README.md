@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Validate Dependencies Licenses
-        uses: skimit/pypi-license-checker-github-action@v1.0.0
+        uses: skimit/pypi-license-checker-github-action@v1.1.0
         env:
           EXTRA_INDEX_URL: ${{ secrets.EXTRA_INDEX_URL }}
           EXTRA_INDEX_URL_PULL_TOKEN: ${{ secrets.EXTRA_INDEX_URL_PULL_TOKEN }}
