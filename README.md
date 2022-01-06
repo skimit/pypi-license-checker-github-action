@@ -20,6 +20,16 @@ jobs:
           EXTRA_INDEX_URL_PULL_TOKEN: ${{ secrets.EXTRA_INDEX_URL_PULL_TOKEN }}
 ```
 
+## Ignore specific dependencies
+Should you with to ignore specific dependencies from having their licenses checked, all you need to do is create a new file on your repository root folder called `allowed_dependencies.txt`. Inside the file, just place the names of the dependencies you want to ignore. E.g.:
+
+```shell
+▶ cat allowed_dependencies.txt
+bidict
+fastapi
+tqdm
+```
+
 ## Motivation
 [Deeper Insights](https://deeperinsights.com)™ mission is to empower people to use data more effectively and to demystify artificial intelligence. Rather than holding up the common narrative of machines replacing humans, we see how machines can help humans to have easier lives and better businesses. Creating bespoke solutions is part of our DNA. We came up with this solution to help our specialists focus on delivering the best version of their work, using automation to take care of the repetitive tasks.
 
