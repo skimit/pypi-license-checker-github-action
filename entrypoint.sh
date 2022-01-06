@@ -14,6 +14,11 @@ if [ -f pyproject.toml ]; then
     POETRY_HTTP_BASIC_GEMFURY_USERNAME="$EXTRA_INDEX_URL_PULL_TOKEN" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet 2>&1 1>/dev/null
 fi
 
+python -m venv env
+
+# shellcheck source=/dev/null
+. env/bin/activate
+
 pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_PULL_TOKEN":@"$EXTRA_INDEX_URL" --quiet 2>&1 1>/dev/null 
 
 [ $? -eq 0 ] || exit 1
