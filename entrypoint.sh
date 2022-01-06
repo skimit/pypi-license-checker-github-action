@@ -21,7 +21,7 @@ python -m venv env
 
 pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_PULL_TOKEN":@"$EXTRA_INDEX_URL" --quiet 2>&1 1>/dev/null 
 
-[ $? -eq 0 ] || exit 1
+[ $? -eq 0 ] || printf "\n😵 Something went wrong installing dependencies... Please, check logs above.\n\n" && exit 1
 
 pip install pip-licenses --quiet > /dev/null 2>&1
 
