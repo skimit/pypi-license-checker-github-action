@@ -10,7 +10,7 @@ fi
 python -m pip install --upgrade pip --quiet 2>&1 1>/dev/null
 
 if [ -f pyproject.toml ]; then
-    pip install poetry --quiet > /dev/null 2>&1
+    pip install poetry --quiet 2>&1 1>/dev/null 
     POETRY_HTTP_BASIC_GEMFURY_USERNAME="$EXTRA_INDEX_URL_PULL_TOKEN" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet 2>&1 1>/dev/null
 fi
 
@@ -19,11 +19,22 @@ python -m venv env
 # shellcheck source=/dev/null
 . env/bin/activate
 
+# Update pip inside the virtual environment
+python -m pip install --upgrade pip --quiet 2>&1 1>/dev/null
+
 pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_PULL_TOKEN":@"$EXTRA_INDEX_URL" --quiet 2>&1 1>/dev/null 
 
-[ $? -eq 0 ] || printf "\n😵 Something went wrong installing dependencies... Please, check logs above.\n\n" && exit 1
+if [ -f allowed_dependencies.txt ]; then
+    while IFS="" read -r DEPENDENCY || [ -n "$DEPENDENCY" ]
+    do
+        printf "\n\nUninstalling %s...\n\n" "$DEPENDENCY"
+        pip uninstall "$DEPENDENCY" --yes --quiet 2>&1 1>/dev/null
+    done < allowed_dependencies.txt
+fi
 
-pip install pip-licenses --quiet > /dev/null 2>&1
+[ $? -eq 0 ] || (printf "\n😵 Something went wrong installing dependencies... Please, check logs above.\n\n" && exit 1)
+
+pip install pip-licenses --quiet 2>&1 1>/dev/null 
 
 printf "\n👉🏽 Validating installed dependencies licenses...\n\n"
 
