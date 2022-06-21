@@ -11,7 +11,7 @@ python -m pip install --upgrade pip --quiet 2>&1 1>/dev/null
 
 if [ -f pyproject.toml ]; then
     pip install poetry --quiet 2>&1 1>/dev/null 
-    POETRY_HTTP_BASIC_GEMFURY_USERNAME="$EXTRA_INDEX_URL_PULL_TOKEN" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet 2>&1 1>/dev/null
+    POETRY_HTTP_BASIC_ARTIFACTORY_USERNAME="$EXTRA_INDEX_URL_PULL_TOKEN" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet 2>&1 1>/dev/null
 fi
 
 python -m venv env
