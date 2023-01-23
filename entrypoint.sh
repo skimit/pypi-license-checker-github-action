@@ -1,4 +1,7 @@
-#!/bin/sh -l
+#!/bin/bash
+set -e
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+trap 'echo "\"${last_command}\" command exited with exit code $?."; cat ~/cmd.log' EXIT
 
 cd /github/workspace || exit 1
 
@@ -7,11 +10,13 @@ if [ ! -f requirements.txt ] && [ ! -f pyproject.toml ]; then
     exit 0;
 fi
 
-python -m pip install --upgrade pip --quiet 2>&1 1>/dev/null
+python -m pip install --upgrade pip &> ~/cmd.log
 
 if [ -f pyproject.toml ]; then
-    pip install poetry --quiet 2>&1 1>/dev/null 
-    POETRY_HTTP_BASIC_ARTIFACTORY_USERNAME="$EXTRA_INDEX_URL_USERNAME" POETRY_HTTP_BASIC_ARTIFACTORY_PASSWORD="$EXTRA_INDEX_URL_PASSWORD" poetry export -f requirements.txt --output requirements.txt --without-hashes --quiet 2>&1 1>/dev/null
+    pip install poetry &> ~/cmd.log
+    poetry source add --secondary artifactory https://deeperinsights.jfrog.io/artifactory/api/pypi/deeper-insights-pypi/simple
+    poetry config http-basic.artifactory $EXTRA_INDEX_URL_USERNAME $EXTRA_INDEX_URL_PASSWORD
+    poetry export -f requirements.txt --output requirements.txt --without-hashes &> ~/cmd.log
 fi
 
 python -m venv env
@@ -20,21 +25,21 @@ python -m venv env
 . env/bin/activate
 
 # Update pip inside the virtual environment
-python -m pip install --upgrade pip --quiet 2>&1 1>/dev/null
+python -m pip install --upgrade pip &> ~/cmd.log
 
-pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_USERNAME":"$EXTRA_INDEX_URL_PASSWORD"@"$EXTRA_INDEX_URL" --quiet 2>&1 1>/dev/null 
+pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_USERNAME":"$EXTRA_INDEX_URL_PASSWORD"@"$EXTRA_INDEX_URL" &> ~/cmd.log
 
 if [ -f allowed_dependencies.txt ]; then
     while IFS="" read -r DEPENDENCY || [ -n "$DEPENDENCY" ]
     do
         printf "\n\nUninstalling %s...\n\n" "$DEPENDENCY"
-        pip uninstall "$DEPENDENCY" --yes --quiet 2>&1 1>/dev/null
+        pip uninstall "$DEPENDENCY" --yes &> ~/cmd.log
     done < allowed_dependencies.txt
 fi
 
 [ $? -eq 0 ] || (printf "\n😵 Something went wrong installing dependencies... Please, check logs above.\n\n" && exit 1)
 
-pip install pip-licenses --quiet 2>&1 1>/dev/null 
+pip install pip-licenses &> ~/cmd.log
 
 printf "\n👉🏽 Validating installed dependencies licenses...\n\n"
 
