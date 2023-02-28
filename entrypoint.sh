@@ -11,18 +11,27 @@ if [ ! -f requirements.txt ] && [ ! -f pyproject.toml ]; then
     exit 0;
 fi
 
+# Check if EXTRA_SYSTEM_DEPENDENCIES is set
+if [ -n "$EXTRA_SYSTEM_DEPENDENCIES" ]; then
+    printf "\n\nInstalling extra system dependencies: '%s'" "$EXTRA_SYSTEM_DEPENDENCIES"
+    apt-get update &> ~/cmd.log
+    # shellcheck disable=SC2086
+    apt-get install -y gcc $EXTRA_SYSTEM_DEPENDENCIES &> ~/cmd.log
+    printf "\n\nExtra system dependencies installed successfully!"
+fi
+
 python -m pip install --upgrade pip &> ~/cmd.log
 
 if [ -f pyproject.toml ]; then
     pip install poetry &> ~/cmd.log
     poetry source add --secondary artifactory https://deeperinsights.jfrog.io/artifactory/api/pypi/deeper-insights-pypi/simple
-    poetry config http-basic.artifactory $EXTRA_INDEX_URL_USERNAME $EXTRA_INDEX_URL_PASSWORD
+    poetry config http-basic.artifactory "$EXTRA_INDEX_URL_USERNAME" "$EXTRA_INDEX_URL_PASSWORD"
     poetry export -f requirements.txt --output requirements.txt --without-hashes &> ~/cmd.log
 fi
 
 python -m venv env
 
-# shellcheck source=/dev/null
+# shellcheck disable=SC1091
 . env/bin/activate
 
 # Update pip inside the virtual environment
