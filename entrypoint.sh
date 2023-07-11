@@ -40,6 +40,7 @@ python -m pip install --upgrade pip &> ~/cmd.log
 pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_USERNAME":"$EXTRA_INDEX_URL_PASSWORD"@"$EXTRA_INDEX_URL" &> ~/cmd.log
 
 if [ -f allowed_dependencies.txt ]; then
+    sed -i '/^$/d' allowed_dependencies.txt
     while IFS="" read -r DEPENDENCY || [ -n "$DEPENDENCY" ]
     do
         printf "\n\nUninstalling %s...\n\n" "$DEPENDENCY"
