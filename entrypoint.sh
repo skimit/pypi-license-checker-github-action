@@ -24,8 +24,9 @@ python -m pip install --upgrade pip &> ~/cmd.log
 
 if [ -f pyproject.toml ]; then
     pip install poetry &> ~/cmd.log
-    poetry source add --secondary artifactory https://deeperinsights.jfrog.io/artifactory/api/pypi/deeper-insights-pypi/simple
+    poetry source add --priority supplemental artifactory https://deeperinsights.jfrog.io/artifactory/api/pypi/deeper-insights-pypi/simple
     poetry config http-basic.artifactory "$EXTRA_INDEX_URL_USERNAME" "$EXTRA_INDEX_URL_PASSWORD"
+    poetry self add poetry-plugin-export &> ~/cmd.log
     poetry export -f requirements.txt --output requirements.txt --without-hashes &> ~/cmd.log
 fi
 
