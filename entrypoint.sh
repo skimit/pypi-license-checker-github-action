@@ -7,27 +7,31 @@ trap 'echo "\"${last_command}\" command exited with exit code $?."; cat ~/cmd.lo
 cd /github/workspace || exit 1
 
 if [ ! -f requirements.txt ] && [ ! -f pyproject.toml ]; then
-    printf "\n\nCouldn't find requirements.txt nor pyproject.toml files. Ignoring...";
-    exit 0;
+    printf "\n\nCouldn't find requirements.txt nor pyproject.toml files. Ignoring..."
+    exit 0
 fi
 
 # Check if EXTRA_SYSTEM_DEPENDENCIES is set
 if [ -n "$EXTRA_SYSTEM_DEPENDENCIES" ]; then
     printf "\n\nInstalling extra system dependencies: '%s'" "$EXTRA_SYSTEM_DEPENDENCIES"
-    apt-get update &> ~/cmd.log
+    apt-get update &>~/cmd.log
     # shellcheck disable=SC2086
-    apt-get install -y gcc $EXTRA_SYSTEM_DEPENDENCIES &> ~/cmd.log
+    apt-get install -y gcc $EXTRA_SYSTEM_DEPENDENCIES &>~/cmd.log
     printf "\n\nExtra system dependencies installed successfully!"
 fi
 
-python -m pip install --upgrade pip &> ~/cmd.log
+python -m pip install --upgrade pip &>~/cmd.log
 
 if [ -f pyproject.toml ]; then
-    pip install poetry &> ~/cmd.log
-    poetry source add --priority supplemental artifactory https://deeperinsights.jfrog.io/artifactory/api/pypi/deeper-insights-pypi/simple
-    poetry config http-basic.artifactory "$EXTRA_INDEX_URL_USERNAME" "$EXTRA_INDEX_URL_PASSWORD"
-    poetry self add poetry-plugin-export &> ~/cmd.log
-    poetry export -f requirements.txt --output requirements.txt --without-hashes &> ~/cmd.log
+    pip install poetry &>~/cmd.log
+
+    # Check if required environment variables are set
+    if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
+        poetry source add --priority supplemental artifactory "https://$EXTRA_INDEX_URL"
+        poetry config http-basic.artifactory "$EXTRA_INDEX_URL_USERNAME" "$EXTRA_INDEX_URL_PASSWORD"
+    fi
+    poetry self add poetry-plugin-export &>~/cmd.log
+    poetry export -f requirements.txt --output requirements.txt --without-hashes &>~/cmd.log
 fi
 
 python -m venv env
@@ -36,22 +40,26 @@ python -m venv env
 . env/bin/activate
 
 # Update pip inside the virtual environment
-python -m pip install --upgrade pip &> ~/cmd.log
+python -m pip install --upgrade pip &>~/cmd.log
 
-pip install --no-cache-dir -r requirements.txt --extra-index-url https://"$EXTRA_INDEX_URL_USERNAME":"$EXTRA_INDEX_URL_PASSWORD"@"$EXTRA_INDEX_URL" &> ~/cmd.log
+# Check if required environment variables are set
+if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
+    EXTRA_INDEX_REPOSITORY="https://$EXTRA_INDEX_URL_USERNAME:$EXTRA_INDEX_URL_PASSWORD@$EXTRA_INDEX_URL"
+fi
+
+pip install --no-cache-dir -r requirements.txt --extra-index-url "$EXTRA_INDEX_REPOSITORY" &>~/cmd.log
 
 if [ -f allowed_dependencies.txt ]; then
     sed -i '/^$/d' allowed_dependencies.txt
-    while IFS="" read -r DEPENDENCY || [ -n "$DEPENDENCY" ]
-    do
+    while IFS="" read -r DEPENDENCY || [ -n "$DEPENDENCY" ]; do
         printf "\n\nUninstalling %s...\n\n" "$DEPENDENCY"
-        pip uninstall "$DEPENDENCY" --yes &> ~/cmd.log
-    done < allowed_dependencies.txt
+        pip uninstall "$DEPENDENCY" --yes &>~/cmd.log
+    done <allowed_dependencies.txt
 fi
 
 [ $? -eq 0 ] || (printf "\n😵 Something went wrong installing dependencies... Please, check logs above.\n\n" && exit 1)
 
-pip install pip-licenses &> ~/cmd.log
+pip install pip-licenses &>~/cmd.log
 
 printf "\n👉🏽 Validating installed dependencies licenses...\n\n"
 
