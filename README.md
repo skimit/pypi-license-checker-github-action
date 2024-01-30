@@ -12,12 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Validate Dependencies Licenses
-        uses: skimit/pypi-license-checker-github-action@v1.1.0
+        uses: skimit/pypi-license-checker-github-action@v1.2.3
         env:
           EXTRA_INDEX_URL: ${{ secrets.EXTRA_INDEX_URL }}
-          EXTRA_INDEX_URL_PULL_TOKEN: ${{ secrets.EXTRA_INDEX_URL_PULL_TOKEN }}
+          EXTRA_INDEX_URL_USERNAME: ${{ secrets.EXTRA_INDEX_URL_USERNAME }}
+          EXTRA_INDEX_URL_PASSWORD: ${{ secrets.EXTRA_INDEX_URL_PASSWORD }}
 ```
 
 ## Ignore specific dependencies
