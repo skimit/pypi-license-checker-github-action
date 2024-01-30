@@ -11,6 +11,12 @@ if [ ! -f requirements.txt ] && [ ! -f pyproject.toml ]; then
     exit 0;
 fi
 
+# Check if required environment variables are set
+if [[ -z "$EXTRA_INDEX_URL" || -z "$EXTRA_INDEX_URL_USERNAME" || -z "$EXTRA_INDEX_URL_PASSWORD" ]]; then
+    printf "\n\nEXTRA_INDEX_URL, EXTRA_INDEX_URL_USERNAME and EXTRA_INDEX_URL_PASSWORD environment variables are required. Ignoring...";
+    exit 0;
+fi
+
 # Check if EXTRA_SYSTEM_DEPENDENCIES is set
 if [ -n "$EXTRA_SYSTEM_DEPENDENCIES" ]; then
     printf "\n\nInstalling extra system dependencies: '%s'" "$EXTRA_SYSTEM_DEPENDENCIES"
