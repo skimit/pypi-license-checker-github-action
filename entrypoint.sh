@@ -20,7 +20,7 @@ if [ -n "$EXTRA_SYSTEM_DEPENDENCIES" ]; then
     printf "\n\nExtra system dependencies installed successfully!"
 fi
 
-python -m pip install --upgrade pip &>~/cmd.log
+python -m pip install --upgrade pip wheel &>~/cmd.log
 
 if [ -f pyproject.toml ]; then
     pip install poetry &>~/cmd.log
