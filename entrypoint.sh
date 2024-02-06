@@ -20,7 +20,7 @@ if [ -n "$EXTRA_SYSTEM_DEPENDENCIES" ]; then
     printf "\n\nExtra system dependencies installed successfully!"
 fi
 
-python -m pip install --upgrade pip wheel &>~/cmd.log
+python -m pip install --upgrade pip &>~/cmd.log
 
 if [ -f pyproject.toml ]; then
     pip install poetry &>~/cmd.log
@@ -40,7 +40,7 @@ python -m venv env
 . env/bin/activate
 
 # Update pip inside the virtual environment
-python -m pip install --upgrade pip &>~/cmd.log
+python -m pip install --upgrade pip wheel &>~/cmd.log
 
 # Check if required environment variables are set
 if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
