@@ -1,4 +1,4 @@
-FROM python:3.9.9-bullseye
+FROM python:3.12-bullseye-slim
 
 COPY entrypoint.sh /entrypoint.sh
 
