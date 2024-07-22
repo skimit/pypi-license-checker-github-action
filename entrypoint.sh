@@ -2,7 +2,7 @@
 set -e
 touch ~/cmd.log
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-trap 'echo "\"${last_command}\" command exited with exit code $?."; cat ~/cmd.log' EXIT
+trap 'printf "Error!\n\n%s command exited with exit code $?.\n\n\n\n" "${last_command}"; cat ~/cmd.log' EXIT
 
 cd /github/workspace || exit 1
 
