@@ -23,7 +23,7 @@ fi
 python -m pip install --upgrade pip &>~/cmd.log
 
 if [ -f pyproject.toml ]; then
-    if [ $(grep "tool.poetry" pyproject.toml) -geq 1 ]; then
+    if [ $(grep "tool.poetry" pyproject.toml) -ge 1 ]; then
         ## PROJECT USES poetry
         python -m pip install --upgrade pip &>~/cmd.log
         pip install poetry &> ~/cmd.log
@@ -35,7 +35,7 @@ if [ -f pyproject.toml ]; then
         fi
         poetry self add poetry-plugin-export &>~/cmd.log
         poetry export -f requirements.txt --output requirements.txt --without-hashes --all-extras --without dev &> ~/cmd.log
-    elif [ $(grep "tool.uv" pyproject.toml) -geq 1 ]; then
+    elif [ $(grep "tool.uv" pyproject.toml) -ge 1 ]; then
         if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
 	    echo "\nmachine ${EXTRA_INDEX_URL}" >> ~/.netrc
 	    echo "login ${EXTRA_INDEX_URL_USERNAME}" >> ~/.netrc
