@@ -41,7 +41,7 @@ if [ -f pyproject.toml ]; then
 	    echo "login ${EXTRA_INDEX_URL_USERNAME}" >> ~/.netrc
 	    echo "password ${EXTRA_INDEX_URL_PASSWORD}" >> ~/.netrc
         fi
-	/bin/uv export --all-extras --no-dev --no-hashes --output-file requirements.txt &> cmd.log
+	/bin/uv export --locked --all-extras --no-dev --no-hashes --output-file requirements.txt &> cmd.log
     else
 	printf "\n\nFound a pyproject.toml, but couldn't find a config for poetry or uv";
 	exit 1;
