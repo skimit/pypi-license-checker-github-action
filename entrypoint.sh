@@ -23,15 +23,29 @@ fi
 python -m pip install --upgrade pip &>~/cmd.log
 
 if [ -f pyproject.toml ]; then
-    pip install poetry &>~/cmd.log
+    if [ $(grep -c "tool.poetry" pyproject.toml) -ge 1 ]; then
+        ## PROJECT USES poetry
+        python -m pip install --upgrade pip &>~/cmd.log
+        pip install poetry &> ~/cmd.log
 
-    # Check if required environment variables are set
-    if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
-        poetry source add --priority supplemental artifactory "https://$EXTRA_INDEX_URL"
-        poetry config http-basic.artifactory "$EXTRA_INDEX_URL_USERNAME" "$EXTRA_INDEX_URL_PASSWORD"
+        # Check if required environment variables are set
+        if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
+            poetry source add --priority supplemental artifactory "https://$EXTRA_INDEX_URL"
+            poetry config http-basic.artifactory "$EXTRA_INDEX_URL_USERNAME" "$EXTRA_INDEX_URL_PASSWORD"
+        fi
+        poetry self add poetry-plugin-export &>~/cmd.log
+        poetry export -f requirements.txt --output requirements.txt --without-hashes --all-extras --without dev &> ~/cmd.log
+    elif [ $(grep -c "tool.uv" pyproject.toml) -ge 1 ]; then
+        if [[ -n "$EXTRA_INDEX_URL" || -n "$EXTRA_INDEX_URL_USERNAME" || -n "$EXTRA_INDEX_URL_PASSWORD" ]]; then
+	    echo "\nmachine ${EXTRA_INDEX_URL}" >> ~/.netrc
+	    echo "login ${EXTRA_INDEX_URL_USERNAME}" >> ~/.netrc
+	    echo "password ${EXTRA_INDEX_URL_PASSWORD}" >> ~/.netrc
+        fi
+	/bin/uv export --locked --all-extras --no-dev --no-hashes --output-file requirements.txt &> cmd.log
+    else
+	printf "\n\nFound a pyproject.toml, but couldn't find a config for poetry or uv";
+	exit 1;
     fi
-    poetry self add poetry-plugin-export &>~/cmd.log
-    poetry export -f requirements.txt --output requirements.txt --without-hashes &>~/cmd.log
 fi
 
 python -m venv env
